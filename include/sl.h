@@ -106,6 +106,7 @@ extern "C" {
 
 	// initialization commands
 
+	SIGIL_API void slGetWindowSize(int *width, int *height);
 	SIGIL_API void slWindow(int width, int height, const char *title, int fullScreen);
 	SIGIL_API void slShowCursor(int showCursor);
 	SIGIL_API void slClose();
@@ -139,6 +140,7 @@ extern "C" {
 
 	// transformations
 
+	SIGIL_API void slIdentity();
 	SIGIL_API void slPush();
 	SIGIL_API void slPop();
 

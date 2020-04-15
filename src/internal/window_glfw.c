@@ -8,7 +8,17 @@ static GLFWwindow *sliProgramWindow = NULL;
 static int sliWindowWidth = 0;
 static int sliWindowHeight = 0;
 
-void sliOpenWindow(int width, int height, const char *title, int fullScreen)
+void (*projectionUpdate)(int, int) = NULL;
+
+void sliResizeCallback(GLFWwindow* window, int width, int height)
+{
+	sliWindowWidth = width;
+	sliWindowHeight = height;
+	glViewport(0, 0, width, height);
+	projectionUpdate(width, height);
+}
+
+void sliOpenWindow(int width, int height, const char *title, int fullScreen, void (*slProjectionUpdate)(int, int))
 {
 	// types enabling us to access WGL functionality for enabling vsync in Windows
 	//#ifdef __MINGW32__
@@ -25,14 +35,21 @@ void sliOpenWindow(int width, int height, const char *title, int fullScreen)
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_REFRESH_RATE, 60);
 
+	// allow resizable window
+	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+
 	// create our OpenGL window
 	sliProgramWindow = glfwCreateWindow(width, height, title, fullScreen ? glfwGetPrimaryMonitor() : NULL, NULL);
 	glfwMakeContextCurrent(sliProgramWindow);
 	glfwSwapInterval(1);
 
-	// record window size
+	// record initial window size
 	sliWindowWidth = width;
 	sliWindowHeight = height;
+
+	// set window resize callback
+	projectionUpdate = slProjectionUpdate;
+	glfwSetWindowSizeCallback(sliProgramWindow, sliResizeCallback);
 
 	// GLFW doesn't handle vsync well in all cases, so we have to go straight to WGL to do this
 	//#ifdef __MINGW32__
@@ -44,6 +61,12 @@ void sliOpenWindow(int width, int height, const char *title, int fullScreen)
 	#ifdef DEBUG
 		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 	#endif
+}
+
+void sliGetWindowSize(int *width, int *height)
+{
+	*width = sliWindowWidth;
+	*height = sliWindowHeight;
 }
 
 void sliShowCursor(int showCursor)

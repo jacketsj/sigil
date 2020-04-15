@@ -68,6 +68,22 @@ static void sliKillResources();
 
 // window commands
 
+void slGetWindowSize(int *width, int *height)
+{
+	if(!sliIsWindowOpen())
+	{
+		fprintf(stderr, "slGetWindowSize() cannot be called because no window exists\n");
+		exit(1);
+	}
+	sliGetWindowSize(width, height);
+}
+
+void slProjectionUpdate(int width, int height)
+{
+	slProjectionMatrix = ortho(0.0f, (double)width, 0.0f, (double)height);
+	sliShadersInit(&slProjectionMatrix);
+}
+
 void slWindow(int width, int height, const char *title, int fullScreen)
 {
 	// error tracking for any window-creation issues we run into
@@ -78,7 +94,7 @@ void slWindow(int width, int height, const char *title, int fullScreen)
 	if(!sliIsWindowOpen())
 	{
 		// use either GLFW or PIGU to set up our window
-		sliOpenWindow(width, height, title, fullScreen);
+		sliOpenWindow(width, height, title, fullScreen, slProjectionUpdate);
 
 		// configure our viewing area
 		glViewport(0, 0, width, height);
@@ -263,6 +279,15 @@ void slSetAdditiveBlend(int additiveBlend)
 }
 
 // transformations
+
+void slIdentity()
+{
+	while (slStackSize > 0)
+	{
+		slPop();
+	}
+	*slCurrentMatrix = identity();
+}
 
 void slPush()
 {

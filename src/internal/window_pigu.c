@@ -166,7 +166,7 @@ static const int SIGIL_RPI_NON_PRINTABLE_KEYS[] = {SL_KEY_ESCAPE, KEY_ESC,
 												 SL_KEY_RIGHT_ALT, KEY_RIGHTALT,
 												 SL_KEY_RIGHT_SUPER, KEY_RIGHTMETA};
 
-void sliOpenWindow(int width, int height, const char *title, int fullScreen)
+void sliOpenWindow(int width, int height, const char *title, int fullScreen, void (*slProjectionUpdate)(int, int))
 {
 	// start up PIGU
 	piguInit();
